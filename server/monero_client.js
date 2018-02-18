@@ -1,13 +1,13 @@
-var bitcoin = require('bitcoin');
+var moneroWallet = require('monero-nodejs');
 var fs = require('fs');
 var path = require('path');
 var config = require('../config/config');
 
-var client = new bitcoin.Client({
-    host: config.MONERO_HOST,
-    port: config.MONERO_PORT,
-    user: config.MONERO_USER,
-    pass: config.MONERO_PASS
-});
+var host = config.MONERO_HOST;
+var port = config.MONERO_PORT;
+
+var client = new moneroWallet(
+    host, port
+);
 
 module.exports = client;
