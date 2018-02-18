@@ -551,7 +551,7 @@ exports.makeWithdrawal = function(userId, satoshis, withdrawalAddress, withdrawa
             if (response.rowCount !== 1)
                 return callback(new Error('Unexpected withdrawal row count: \n' + response));
 
-            client.query('INSERT INTO fundings(user_id, amount, bitcoin_withdrawal_address, withdrawal_id) ' +
+            client.query('INSERT INTO fundings(user_id, amount, monero_withdrawal_address, withdrawal_id) ' +
                 "VALUES($1, $2, $3, $4) RETURNING id",
                 [userId, -1 * satoshis, withdrawalAddress, withdrawalId],
                 function(err, response) {
@@ -577,8 +577,8 @@ exports.getWithdrawals = function(userId, callback) {
         var data = result.rows.map(function(row) {
            return {
                amount: Math.abs(row.amount),
-               destination: row.bitcoin_withdrawal_address,
-               status: row.bitcoin_withdrawal_txid,
+               destination: row.monero_withdrawal_address,
+               status: row.monero_withdrawal_txid,
                created: row.created
            };
         });
@@ -595,7 +595,7 @@ exports.getDeposits = function(userId, callback) {
         var data = result.rows.map(function(row) {
             return {
                 amount: row.amount,
-                txid: row.bitcoin_deposit_txid,
+                txid: row.monero_deposit_txid,
                 created: row.created
             };
         });
@@ -625,7 +625,7 @@ exports.setFundingsWithdrawalTxid = function(fundingId, txid, callback) {
     assert(typeof txid === 'string');
     assert(callback);
 
-    query('UPDATE fundings SET bitcoin_withdrawal_txid = $1 WHERE id = $2', [txid, fundingId],
+    query('UPDATE fundings SET monero_withdrawal_txid = $1 WHERE id = $2', [txid, fundingId],
         function(err, result) {
            if (err) return callback(err);
 
@@ -709,7 +709,7 @@ exports.getSiteStats = function(callback) {
             query("SELECT COUNT(*) FROM games WHERE ended = false AND created < NOW() - interval '5 minutes'", as('unterminated_games', callback));
         },
         function(callback) {
-            query('SELECT COUNT(*) FROM fundings WHERE amount < 0 AND bitcoin_withdrawal_txid IS NULL', as('pending_withdrawals', callback));
+            query('SELECT COUNT(*) FROM fundings WHERE amount < 0 AND monero_withdrawal_txid IS NULL', as('pending_withdrawals', callback));
         },
         function(callback) {
             query('SELECT COALESCE(SUM(fundings.amount), 0)::bigint sum FROM fundings WHERE amount > 0', as('deposits', callback));
