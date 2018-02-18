@@ -58,17 +58,17 @@ CREATE TABLE fundings (
     id bigserial NOT NULL PRIMARY KEY,
     user_id bigint NOT NULL REFERENCES users(id),
     amount bigint NOT NULL,
-    bitcoin_withdrawal_txid text,
-    bitcoin_withdrawal_address text,
+    monero_withdrawal_txid text,
+    monero_withdrawal_address text,
     created timestamp with time zone DEFAULT now() NOT NULL,
     description text,
-    bitcoin_deposit_txid text,
+    monero_deposit_txid text,
     withdrawal_id UUID,
     CONSTRAINT fundings_withdrawal_id_key UNIQUE (withdrawal_id)
 );
 
 ALTER TABLE ONLY fundings
-    ADD CONSTRAINT fundings_user_id_bitcoin_deposit_txid_key UNIQUE (user_id, bitcoin_deposit_txid);
+    ADD CONSTRAINT fundings_user_id_monero_deposit_txid_key UNIQUE (user_id, monero_deposit_txid);
 
 CREATE INDEX fundings_user_id_idx ON fundings USING btree (user_id);
 
